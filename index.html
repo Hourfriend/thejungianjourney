@@ -408,8 +408,36 @@ const TRACKS = [
     document.getElementById('icon-mute').style.display = audio.muted ? ''     : 'none';
   });
 
-  load(0, true);
+  // Load first track but don't autoplay — browsers block autoplay before user interaction.
+  // Music starts automatically on the first click anywhere on the page.
+  load(0, false);
+
+  let started = false;
+  document.addEventListener('click', function startOnce() {
+    if (!started) {
+      started = true;
+      audio.play().catch(() => {});
+      document.removeEventListener('click', startOnce);
+    }
+  }, { capture: true });
+
 })();
+
+// ── Week tabs & day card toggles ──
+function showWeek(n, btn) {
+  document.querySelectorAll('.week-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.week-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('week' + n).classList.add('active');
+  btn.classList.add('active');
+  document.querySelector('.week-nav').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function tog(id) {
+  const card    = document.getElementById(id);
+  const wasOpen = card.classList.contains('open');
+  card.closest('.days-list').querySelectorAll('.day-card.open').forEach(c => c.classList.remove('open'));
+  if (!wasOpen) card.classList.add('open');
+}
 </script>
 
 </body>
